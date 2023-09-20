@@ -5,24 +5,51 @@ class KronosApp:
         self.root = root
         self.root.title("Kronos System")
         self.root.geometry("{0}x{1}+0+0".format(self.root.winfo_screenwidth(), self.root.winfo_screenheight()))
-        self.root.configure(bg="#192e2a")
+        self.root.configure(bg="#b1f0e4")
         self.root.attributes('-fullscreen', True)
-        self.root.bind("<Escape>", self.exit_app)
+        self.root.bind("<Escape>", lambda x: self.root.destroy())
         self.root.bind("<Up>", self.select_option_up)
         self.root.bind("<Down>", self.select_option_down)
+        self.root.bind("<BackSpace>", self.reset_to_password_screen)
+        self.root.bind("<Return>", self.select_current_option)
         self.root.config(cursor="none")  # Hide the mouse cursor
+        self.selection_rectangle = None
         
-        self.password_entry = tk.Entry(self.root, font=("Impact", 20, "bold"), fg="#192e2a", bg="#f2fcfa", justify="center")
+        self.canvas = tk.Canvas(self.root, bg="#b1f0e4", bd=0, highlightthickness=0)
+        self.canvas.pack(fill=tk.BOTH, expand=True)
+        
+        self.init_password_screen()
+
+    def select_option_up(self, event):
+        if self.option_labels:
+            self.selected_option = (self.selected_option - 1) % len(self.options)
+            self.update_option_colors()
+
+    def select_option_down(self, event):
+        if self.option_labels:
+            self.selected_option = (self.selected_option + 1) % len(self.options)
+            self.update_option_colors()
+
+
+    def init_password_screen(self):
+        self.password_entry = tk.Entry(self.canvas, font=("Impact", 20, "bold"), fg="#050908", bg="#f2fcfa", justify="center")
         self.password_entry.insert(0, "PASSWORD")
         self.password_entry.bind("<FocusIn>", self.on_focus_in)
         self.password_entry.bind("<Key>", self.on_key_press)
         self.password_entry.bind("<Return>", self.check_password)
         self.password_entry.place(relx=0.5, rely=0.5, anchor="center", width=self.root.winfo_screenwidth())
-        self.password_entry.focus_set()  # Automatically focus the password entry
         
+        # Disable the password entry for 2 seconds
+        self.password_entry.config(state=tk.DISABLED)
+        self.root.after(2000, self.enable_password_entry)
+
         self.options = ["ISLAND OPERATIONS", "FINANCES", "OMNIDROID METATRINING", "SUPERS"]
         self.selected_option = 0
         self.option_labels = []
+
+    def enable_password_entry(self):
+        self.password_entry.config(state=tk.NORMAL)
+        self.password_entry.focus_set()  # Automatically focus the password entry
 
     def on_focus_in(self, event):
         if self.password_entry.get() == "PASSWORD":
@@ -35,8 +62,7 @@ class KronosApp:
     def check_password(self, event):
         if self.password_entry.get() == "KRONOS":
             self.password_entry.destroy()
-            self.border = tk.Frame(self.root, bg="#f2fcfa", bd=10)
-            self.border.place(relx=0.5, rely=0.5, anchor="center", width=self.root.winfo_screenwidth(), height=320)
+            self.draw_background_rectangle()
             self.display_options()
         else:
             self.password_entry.delete(0, "end")
@@ -45,14 +71,19 @@ class KronosApp:
             self.root.after(5000, self.reset_password_entry)
 
     def reset_password_entry(self):
-        self.password_entry.config(fg="#192e2a")
+        self.password_entry.config(fg="#050908")
         self.password_entry.delete(0, "end")
         self.password_entry.insert(0, "PASSWORD")
 
+    def draw_background_rectangle(self):
+        top_y = self.root.winfo_screenheight() * 0.4 - 30
+        bottom_y = self.root.winfo_screenheight() * 0.7 + 30
+        self.canvas.create_rectangle(0, top_y, self.root.winfo_screenwidth(), bottom_y, fill="#ffffff", outline="#ffffff")
+
     def display_options(self):
         for idx, option in enumerate(self.options):
-            color = "#7ee6d2" if idx == self.selected_option else "green"
-            label = tk.Label(self.root, text=option, font=("Impact", 20, "bold"), fg=color, bg="#192e2a")
+            color = "#050908" if idx == self.selected_option else "#000000"
+            label = tk.Label(self.canvas, text=option, font=("Impact", 20, "bold"), fg=color, bg="#b1f0e4")
             label.place(relx=0.5, rely=0.4 + idx*0.1, anchor="center")
             self.option_labels.append(label)
 
@@ -68,8 +99,77 @@ class KronosApp:
 
     def update_option_colors(self):
         for idx, label in enumerate(self.option_labels):
-            color = "#7ee6d2" if idx == self.selected_option else "green"
+            color = "#050908" if idx == self.selected_option else "#000000"
             label.config(fg=color)
+
+    def reset_to_password_screen(self, event):
+        for label in self.option_labels:
+            label.destroy()
+        self.option_labels.clear()
+        self.canvas.delete("all")
+        self.init_password_screen()
+
+    
+    def update_option_colors(self):
+        for idx, label in enumerate(self.option_labels):
+            color = "#050908" if idx == self.selected_option else "#000000"
+            label.config(fg=color)
+            
+            if idx == self.selected_option:
+                if self.selection_rectangle:
+                    self.canvas.delete(self.selection_rectangle)
+                x0, y0, x1, y1 = label.bbox()
+                self.selection_rectangle = self.canvas.create_rectangle(x0-10, y0-10, x1+10, y1+10, outline="#2986cc", width=2)
+
+    def select_current_option(self, event):
+        if self.selected_option == 0:
+            self.island_operations_screen()
+        elif self.selected_option == 1:
+            self.finances_screen()
+        elif self.selected_option == 2:
+            self.omnidroid_metatrining_screen()
+        # Add more options as needed
+
+    def island_operations_screen(self):
+        self.canvas.delete("all")
+        width = self.root.winfo_screenwidth() * 0.8
+        height = self.root.winfo_screenheight() * 0.8
+        x = (self.root.winfo_screenwidth() - width) / 2
+        y = (self.root.winfo_screenheight() - height) / 2
+        self.canvas.create_rectangle(x, y, x+width, y+height, fill="#ffffff")
+        self.canvas.create_text(x+width-10, y+10, text="ISLAND OPERATIONS", font=("Impact", 40, "bold"), anchor="ne")
+
+    def finances_screen(self):
+        self.canvas.delete("all")
+        width = self.root.winfo_screenwidth() * 0.8
+        height = self.root.winfo_screenheight() * 0.8
+        x = (self.root.winfo_screenwidth() - width) / 2
+        y = (self.root.winfo_screenheight() - height) / 2
+        self.canvas.create_rectangle(x, y, x+width, y+height, fill="#ffffff")
+        self.canvas.create_text(x+width-10, y+10, text="FINANCES", font=("Impact", 40, "bold"), anchor="ne")
+        self.canvas.create_line(x, y+height/2, x+width, y+height/2, fill="#000000", width=5)
+
+    def omnidroid_metatrining_screen(self):
+        self.canvas.delete("all")
+        radius = min(self.root.winfo_screenwidth(), self.root.winfo_screenheight()) * 0.4
+        x = self.root.winfo_screenwidth() / 2
+        y = self.root.winfo_screenheight() / 2
+        self.canvas.create_oval(x-radius, y-radius, x+radius, y+radius, fill="#ffffff")
+        
+        # Display current time
+        current_time = datetime.now().strftime('%H:%M:%S')
+        self.canvas.create_text(x, y-30, text=current_time, font=("Impact", 40), fill="#000000")
+        
+        # Countdown to October 31, 2023
+        target_date = datetime(2023, 10, 31)
+        delta = target_date - datetime.now()
+        months = delta.days // 30
+        days = delta.days % 30
+        hours, remainder = divmod(delta.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        countdown_text = f"{months} months, {days} days, {hours} hours, {minutes} minutes, {seconds} seconds"
+        self.canvas.create_text(x, y+30, text=countdown_text, font=("Impact", 20), fill="#000000")
+
 
     def exit_app(self, event):
         self.root.quit()
