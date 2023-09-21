@@ -1,6 +1,54 @@
 import tkinter as tk
 from datetime import datetime, timedelta
 
+
+"""
+TODO:
+1. Password Security:
+    - Avoid storing passwords in plaintext within the code.
+    - Consider using a hashing mechanism to check passwords or integrating a more secure authentication method.
+
+2. UI/UX Enhancements:
+    - Improve the user interface with images, better fonts, or animations for a more appealing look.
+
+3. Functionality Enhancements:
+    - Expand the functionality of screens like `island_operations_screen`, `finances_screen`, etc.
+    - Display relevant data or add interactive elements to these screens.
+
+4. Code Organization:
+    - Refactor the code to remove redundancies, such as repeated methods (like `update_option_colors`).
+
+5. Extendibility:
+    - Organize each screen's logic into separate classes or modules for better maintainability and future additions.
+
+6. Error Handling:
+    - Implement mechanisms to handle potential issues, such as incorrect user inputs or system errors.
+
+7. Logging:
+    - Add logging to keep track of user actions, errors, or other relevant events.
+
+8. Documentation:
+    - Enhance comments and docstrings to explain the purpose and functionality of each method and class.
+
+9. Countdown Accuracy:
+    - Improve the accuracy of the countdown to specific dates (e.g., October 31, 2023).
+    - Refine the method used to calculate the difference between dates.
+
+10. Exit Option:
+    - Provide a clear way for users to exit the application, such as a button or a menu option.
+
+11. Responsive Design:
+    - Ensure the GUI is adaptive and looks good on different screen sizes and resolutions.
+
+12. Additional Features:
+    - Depending on the application's purpose, consider adding features like data storage, integration with other systems, or user management capabilities.
+
+NOTE: When working on these TODOs, ensure to provide detailed explanations and comments for each change to maintain clarity for other contributors.
+"""
+
+# Rest of your code starts here...
+
+
 class KronosApp:
     def __init__(self, root):
         self.root = root
