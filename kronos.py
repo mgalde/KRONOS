@@ -46,7 +46,6 @@ TODO:
 NOTE: When working on these TODOs, ensure to provide detailed explanations and comments for each change to maintain clarity for other contributors.
 """
 
-# Rest of your code starts here...
 
 class KronosApp:
     def __init__(self, root):
